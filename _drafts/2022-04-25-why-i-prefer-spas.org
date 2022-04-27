@@ -1,0 +1,58 @@
+#+TITLE: Why I prefer SPAs
+#+AUTHOR: Shrikanth Upadhayaya
+#+DATE: 2022-04-25
+#+LAYOUT: post
+#+TAGS: frontend web spa mpa javascript react
+
+There is a prevailing tone in some programming communities, such as
+HN, which I think starts something like this:
+
+#+begin_quote
+Now, I'm just a humble country developer, but I think SPAs are the
+original sin!
+#+end_quote
+
+Often, this is followed by a tirade against JavaScript, or complaints
+about bloat, or something about the purity and ease of use of
+server-rendered HTML. Often, there is a strong belief that SPAs are a
+solution looking for a problem, or a tool that is more often than not
+unnecessary.
+
+But - even as a backend-first engineer - I sincerely disagree. I think
+SPAs are /good/, and for an ever-increasing class of applications that
+we as "web developers" make they are becoming /necessary/. This post
+is largely a result my frustration with the way in which the
+conversation around SPAs and related tech has completely stagnated,
+and therefore my attempt at making a case for SPAs to move that
+conversation forward.
+
+(Incidentally, I'm deliberately not expanding on what an SPA is at
+this stage. If you don't know, blessed are ye! I envy the amount of
+grass you touch, and aspire to not care as much about internet
+argument #516782.)
+
+* Establishing my bona fides
+
+* Some Groundwork
+
+* My Reasoning
+
+** Client Side Rendering is King
+Roughly: you can't avoid rendering on the client for way too many
+kinds of interactions, and once you're rendering on the client, why
+render HTML on the server?
+
+** The Tortured Techniques of Rendering HTML on the Server
+Roughly: the pain involved in keeping track of state within the HTML
+document itself, <turbo-frame> everywhere, the "siloed" nature of
+basecamp
+
+** The Simplicity and Purity of JS Frameworks
+Roughly: How React vastly simplifies the way you think about UI
+
+* Addressing Concerns
+
+** SEO, SSR and the complexity involved
+
+** Small-a accessibility
+Roughly: about low power devices, devices which don't support js, etc.
