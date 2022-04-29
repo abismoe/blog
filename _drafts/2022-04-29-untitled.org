@@ -1,0 +1,139 @@
+#+TITLE: Untitled Blog Post about Frameworks and Libraries
+#+AUTHOR: Shrikanth Upadhayaya
+#+TAGS: arch
+#+LAYOUT: post
+
+I've never quite been persuaded by what I'll be calling the "Libraries
+over Frameworks" argument, and for a while now I've wanted to note
+down why. This post is an attempt at that. I'm not going to be
+critiquing or calling out specific posts or people or variants of the
+argument, but instead focus on the common points I've seen when this
+argument is brought up across tech and programming fora.
+
+I have to admit that my first reaction, whenever this argument comes
+up, is negative primarily because it smacks of elitism; I often find
+that those arguing against frameworks also often have an attitude not
+far removed from "/Real/ Software Engineers write x86 assembly and
+flip each bit with butterflies!", but while that tone and attitude
+often makes it an /unpleasant/ discussion to have I don't think it is
+a sufficient rebuttal to the argument itself. Rather, I think that
+point of view actually captures what I think most people find annoying
+about frameworks: people's inability to work across abstraction
+boundaries.
+
+To expand on that, let me start by examining what is often posited as
+the key difference between frameworks and libraries: *inversion of
+control*. When you're working with a framework, you have to work
+within the rules of the framework, but you decide when and how to use
+a library. I've seen it tersely put as:
+
+#+begin_quote
+A framework calls your code, while you call library code.
+#+end_quote
+
+(This isn't a real quote, I'm just using the quote formatting as a
+callout.)
+
+There are a few other arguments, but the inversion of control one is
+the most repeated one and I believe the most fundamental one in this
+debate. I've always found this argument extremely funny because the OG
+of these debates - at least, the OG when I first got into
+development - was React. /React!/ I can't count the number of times
+I'd heard "React is better than Angular because React is a /Library/
+and Angular is a /Framework/!" You don't even have to take my word for
+it: [[https://www.oreilly.com/library/view/what-react-is/9781491996744/ch01.html][this argument is present literally in published books.]]
+
+Of course, I think this makes very little sense, because React /also/
+takes control away from you, and especially back in the day when this
+was common to say, you were almost always writing class components
+which made it extremely obvious that it did so: consider
+=componentDidMount()=, who do you think is calling that function?
+
+In that sense, I think React is also emblematic of the argument. The
+people who believe React is a library think it is so because it is
+unopinionated about several other things a web app needs to do, and so
+gives you /more/ control than something like Angular, which comes with
+standard ways to make requests and manage state. But the reason I
+think that argument is unconvincing is that it's /arbitrary/, and its
+proponents are essntially drawing a line at a point and saying: I am
+perfectly happy giving up control until here, but anything beyond is
+wrong.
+
+This is true of every such argument I've seen. Some examples include
+people saying they prefer Go's http stdlib implementation over a
+framework, which again, makes it pretty easy to show that there is
+still some inversion of control: when writing http handlers in Go, you
+are basically writing a function that the server routes and then
+calls. Their line is after the router, but before the point where a
+framework like Rails leaves you. In fact, I think I'd be hard pressed
+to show any example of a server-side "library" that does /no/
+inversion of control; the only way to accomplish that, AIUI, is by
+manually opening a socket and reading/writing from/to it.
+
+But why stop there? Even that socket is technically involves an
+inversion of control - from the /operating system/. And the OS itself
+is called from somewhere, so even if you hand-crafted a program in
+assembly with its own implementation of TCP that didn't require any
+primitives, you're still running into a boundary where you are being
+called. So, I think the idea that inversion of control is a
+fundamental flaw that you should avoid is... flawed!
+
+But I'm not here just to be pedantic. What I mean is, there's turtles
+all the way down, and the people who like "libraries" have picked one
+particular turtle as their level. What people call "libraries" or
+"frameworks" are just specific /levels of abstractions/ they've chosen
+as their baselines. In a way, it is slightly similar to the [[http://www.paulgraham.com/avg.html][The Blub
+Paradox]], but with levels of abstraction substituted for levels of
+power.
+
+And if you look at the reasons people give for why they don't like
+frameworks, such as: you'll be fine so long as you're in the happy
+path, but the moment you need to do something the framework doesn't
+specifically allow for, you're in for a world of pain; I think this
+reason betrays an inability to work /across/ levels of abstractions
+than a fundamental flaw in the concept of abstractions itself.
+
+Let me explain. I've written Rails code both professionally and
+personally for years now; often I've had to use Warden or Devise in
+some capacity. Neither is well known for supporting API authentication
+out of the box; for ex. Devise assumes by default you're server
+rendering views and have cookies, which may not be the best option in
+a lot of cases. But Devise also offers quite a bit more: you get tools
+for locking accounts, email verification and password resets thrown
+in, and you also have a stronger guarantee with sane defaults that
+you've not completely fucked up your auth system.
+
+I wanted Devise for those reasons, so when I ran into its limitations
+with API authentication I decided to dig /into/ its abstraction
+instead. Over the course of an afternoon, I learned how devise did its
+things, figured out a way to work at that level and extend it, and
+made my changes in application code to make it work the way I wanted
+it to. I touched, maybe, 15% of the capabilities of Devise, but by the
+end I had all the features I wanted without having to handroll things
+like email verification.
+
+Sure, it's not easy. You were working above this level until now, so
+you have to learn an entire new world of concepts to be able to step
+down. That takes time, and it can be frustrating. But, and this is
+important, it's almost always /possible/. Even Rails - which many
+deride for "magic" - is so shockingly open when you dig into it. I've
+had to make a couple of small changes in Rails itself at times, and
+the best one I've made involved adding rack middleware. If you want to
+see something that goes much deeper, [[https://github.blog/2022-04-11-performance-at-github-deferring-stats-with-rack-after_reply/][here's]] a post by the GitHub team
+where they added an implementation for a rack abstraction to make it
+work.
+
+I don't want to present myself as a paragon of virtue or anything like
+that - I'm taking myself as an example because I wasn't always able to
+do this either! Everything below my own turtle of abstraction was
+dangerous and unfamiliar, and everything above it was restrictive and
+unnecessary. What changed my mind was Nelson Elhage's excellent blog
+post [[https://blog.nelhage.com/post/computers-can-be-understood/]["Computers can be understood"]], which gave me the motivation to
+explore levels below what I was used to, understand them deeply, and
+then be able to work at that level should I need it. I think this also
+answers one of the arguments that often brough up by proponents of
+"Libraries over Frameworks" - that people who live within frameworks
+don't learn the fundamentals. It's true that many don't, but the way
+forward on that is to /encourage/ them to learn about why things are
+they way they are. You don't need to throw out the framework baby with
+the ignorance bathwater.
